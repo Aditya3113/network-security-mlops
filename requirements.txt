@@ -1,0 +1,10 @@
+pandas
+numpy
+scikit-learn
+pymongo
+mlflow
+dagshub
+fastapi
+uvicorn
+pyyaml
+pydantic
