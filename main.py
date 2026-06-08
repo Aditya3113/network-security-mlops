@@ -6,7 +6,13 @@ load_dotenv()
 
 from network_security.components.data_ingestion import DataIngestion
 from network_security.components.data_validation import DataValidation
-from network_security.entity.config_entity import DataIngestionConfig, DataValidationConfig, TrainingPipelineConfig
+from network_security.components.data_transformation import DataTransformation
+from network_security.entity.config_entity import (
+    DataIngestionConfig, 
+    DataValidationConfig, 
+    DataTransformationConfig, 
+    TrainingPipelineConfig
+)
 from network_security.exception import NetworkSecurityException
 from network_security.logging import logger
 
@@ -27,6 +33,13 @@ if __name__ == "__main__":
         data_validation_artifact = data_validation.initiate_data_validation()
         logger.info("Data Validation Completed Successfully!")
         print(data_validation_artifact)
+
+        logger.info("Starting Data Transformation Phase...")
+        data_transformation_config = DataTransformationConfig(training_pipeline_config)
+        data_transformation = DataTransformation(data_validation_artifact, data_transformation_config)
+        data_transformation_artifact = data_transformation.initiate_data_transformation()
+        logger.info("Data Transformation Completed Successfully!")
+        print(data_transformation_artifact)
         
     except Exception as e:
         raise NetworkSecurityException(e, sys)
