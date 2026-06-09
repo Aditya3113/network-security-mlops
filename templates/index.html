@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Network Shield</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50 flex items-center justify-center h-screen">
+    <div class="bg-white p-8 rounded-lg shadow-xl w-full max-w-md text-center border-t-4 border-blue-600">
+        <h1 class="text-2xl font-bold text-gray-800 mb-2">Network Security AI</h1>
+        <p class="text-gray-500 mb-6 text-sm">Upload raw network traffic logs (CSV) for instant batch phishing detection.</p>
+        
+        <form action="/predict" method="post" enctype="multipart/form-data" class="space-y-4">
+            <div class="border-2 border-dashed border-gray-300 p-6 rounded-md bg-gray-50 hover:bg-gray-100 transition">
+                <input type="file" name="file" accept=".csv" required 
+                       class="block w-full text-sm text-gray-500 
+                              file:mr-4 file:py-2 file:px-4 
+                              file:rounded-md file:border-0 
+                              file:text-sm file:font-semibold 
+                              file:bg-blue-600 file:text-white 
+                              hover:file:bg-blue-700 cursor-pointer"/>
+            </div>
+            <button type="submit" class="w-full bg-blue-600 text-white font-bold py-3 px-4 rounded-md hover:bg-blue-700 transition shadow-md">
+                Run Threat Analysis
+            </button>
+        </form>
+    </div>
+</body>
+</html>

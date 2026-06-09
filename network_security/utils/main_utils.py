@@ -76,3 +76,15 @@ def evaluate_models(X_train, y_train, X_test, y_test, models: dict) -> dict:
         return report
     except Exception as e:
         raise NetworkSecurityException(e, sys)
+    
+def load_object(file_path: str) -> object:
+    """
+    Loads a serialized Python object (like a Scikit-Learn model) from a pickle file.
+    """
+    try:
+        if not os.path.exists(file_path):
+            raise Exception(f"The file: {file_path} does not exist")
+        with open(file_path, "rb") as file_obj:
+            return pickle.load(file_obj)
+    except Exception as e:
+        raise NetworkSecurityException(e, sys)
