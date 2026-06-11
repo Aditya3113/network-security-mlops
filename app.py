@@ -7,9 +7,12 @@ from fastapi.responses import HTMLResponse, StreamingResponse
 from fastapi.templating import Jinja2Templates
 import uvicorn
 from dotenv import load_dotenv
+from pydantic import BaseModel
+from typing import Dict, Any
 
 from network_security.exception import NetworkSecurityException
 from network_security.utils.main_utils import load_object
+from network_security.components.incident_agent import IncidentReportAgent
 
 load_dotenv()
 
@@ -17,10 +20,10 @@ app = FastAPI(title="Network Security MLOps API")
 
 templates = Jinja2Templates(directory="templates")
 
+class ThreatPayload(BaseModel):
+    network_data: Dict[str, Any]
+
 def get_latest_artifacts():
-    """
-    Dynamically finds the most recently generated model and preprocessor in the artifacts folder.
-    """
     artifacts_dir = "artifacts"
     if not os.path.exists(artifacts_dir):
         raise Exception("Artifacts directory not found. Please run main.py first.")
@@ -35,16 +38,10 @@ def get_latest_artifacts():
 
 @app.get("/", response_class=HTMLResponse)
 async def index(request: Request):
-    """
-    Renders the clean, minimalist UI for file uploads.
-    """
     return templates.TemplateResponse(request=request, name="index.html")
 
 @app.post("/predict")
 async def predict_batch(file: UploadFile = File(...)):
-    """
-    Accepts a CSV, transforms it, predicts using the AI, and returns a downloadable results CSV.
-    """
     try:
         contents = await file.read()
         df = pd.read_csv(io.BytesIO(contents))
@@ -59,7 +56,6 @@ async def predict_batch(file: UploadFile = File(...)):
             df_features = df
 
         transformed_data = preprocessor.transform(df_features)
-
         predictions = model.predict(transformed_data)
         
         df['Prediction_Code'] = predictions
@@ -71,7 +67,15 @@ async def predict_batch(file: UploadFile = File(...)):
         response.headers["Content-Disposition"] = f"attachment; filename=Threat_Report_{file.filename}"
         
         return response
+    except Exception as e:
+        raise NetworkSecurityException(e, sys)
 
+@app.post("/analyze-incident")
+async def analyze_incident(payload: ThreatPayload):
+    try:
+        agent = IncidentReportAgent()
+        report_markdown = agent.generate_report(payload.network_data)
+        return {"status": "success", "report": report_markdown}
     except Exception as e:
         raise NetworkSecurityException(e, sys)
 
